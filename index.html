@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Dodow</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="no">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Dodow">
+  <link rel="icon" href="/icons/favicon.ico" />
+  <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+  <meta name="msapplication-TileColor" content="#000000">
+  <style>
+    * {
+      outline: none;
+    }
+    html,
+    body {
+      background-color: #000;
+      margin: 0;
+    }
+
+    .flex {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    body {
+      height: 100vh;
+    }
+
+    #data {
+      margin-top: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @keyframes slidein {
+
+      0%,
+      2% {
+        transform: scale(0);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .container {
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .circle {
+      height: 200px;
+      width: 200px;
+      border-radius: 100%;
+    }
+
+    #duration {
+      color: rgba(255, 255, 255, 0.3);
+      font-family: sans-serif;
+      margin-bottom: 5px;
+      background-color: transparent;
+      border: 0;
+      appearance: none;
+    }
+
+    #circle {
+      background-color: #FFF;
+      transform: scale(0);
+    }
+
+    .button {
+      background-color: white;
+      border: 0;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .button2 {
+      padding: 8px 14px;
+      text-transform: uppercase;
+    }
+
+    .animate {
+      animation: 0s ease-in-out 0s infinite alternate slidein;
+    }
+  </style>
+  <script>
+    let interval
+    let timeout
+    let lock
+    const vibe = 40
+
+    async function test() {
+      clearInterval(interval)
+
+      const nbSec = 60 / 2 / Number(document.querySelector('#nbSec').value)
+      const duration = Number(document.querySelector('#duration').value)
+
+      document.querySelector('#circle').style['animation-duration'] = nbSec + 's'
+      document.querySelector('#circle').classList.add('animate')
+      document.querySelector('#nbSec').classList.add('hidden')
+      document.querySelector('#circle').classList.remove('hidden')
+      document.querySelector('#data').classList.add('hidden')
+
+      navigator.vibrate(vibe)
+      interval = setInterval(() => {
+        navigator.vibrate(vibe)
+      }, nbSec * 1000)
+
+      timeout = setTimeout(() => {
+        clearInterval(interval)
+
+        location.reload()
+      }, duration * 1000 * 60)
+      try {
+        lock = await navigator.wakeLock.request("screen");
+      } catch (err) {
+        alert(`${err.name}, ${err.message}`);
+      }
+    }
+  </script>
+
+</head>
+
+<body class="flex">
+  <select id="duration">
+    <option value="5" selected>5 min</option>
+    <option value="10">10 min</option>
+    <option value="15">15 min</option>
+    <option value="20">20 min</option>
+    <option value="25">25 min</option>
+  </select>
+
+  <div class="container circle flex">
+    <div id="circle" class="circle hidden"></div>
+    <select id="nbSec" class="button">
+      <option value="4">4 rpm</option>
+      <option value="5">5 rpm</option>
+      <option value="6" selected>6 rpm</option>
+      <option value="7">7 rpm</option>
+    </select>
+  </div>
+
+  <div id="data" class="flex">
+    <button class="button button2" onclick="test()">démarrer</button>
+  </div>
+</body>
+
+</html>
